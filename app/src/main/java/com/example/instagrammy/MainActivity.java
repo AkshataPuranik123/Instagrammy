@@ -14,10 +14,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -25,12 +30,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button login, signup;
     private FirebaseAuth mAuth;
     private ProgressBar progressBar;
+    private FirebaseFirestore fStore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        fStore = FirebaseFirestore.getInstance();
         login = (Button) findViewById(R.id.button);
         signup = (Button) findViewById(R.id.button2);
         emailT = (EditText) findViewById(R.id.editTextTextEmailAddress);
@@ -39,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mAuth = FirebaseAuth.getInstance();
         login.setOnClickListener(this);
         signup.setOnClickListener(this);
+
 
     }
     //Main event
@@ -57,9 +65,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void userLogin(){
         String email = emailT.getText().toString().trim();
         String password = passwordT.getText().toString().trim();
-        //email ="akshata@gmail.com";
-        //password ="Admin@123";
-
         if(email.isEmpty()){
             emailT.setError("Email is required!");
             emailT.requestFocus();
@@ -84,17 +89,44 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         mAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(this, task -> {
             if (task.isSuccessful()) {
+
+                Toast.makeText(MainActivity.this, "Login Successful!", Toast.LENGTH_LONG).show();
                 //FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                //fetchData();
+
+                
                 //redirect to user profile
-                    startActivity(new Intent(MainActivity.this, Activity3.class));
+                startActivity(new Intent(MainActivity.this, Activity3.class));
+                progressBar.setVisibility(View.GONE);
+
+                    //if user id does not exists then message: sign up as a new user
             } else {
-                Toast.makeText(MainActivity.this, "Failed to login! Please check your credentials!", Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, "Error: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                 progressBar.setVisibility(View.GONE);
             }
         });
 
 
 
+    }
+
+    public void fetchData() {
+        DocumentReference  documentReference = fStore.collection("users").document("0Wjoz8MqNYfEsyeh0KkFCGAJgw22");
+        documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                if(documentSnapshot.exists()){
+
+                }else{
+                    Toast.makeText(getApplicationContext(),"Row Not found",Toast.LENGTH_LONG).show();
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(getApplicationContext(),"Failed to fetch data", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
 

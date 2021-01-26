@@ -12,6 +12,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
@@ -21,22 +22,30 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 
 public class Activity2 extends AppCompatActivity implements View.OnClickListener {
 
 
+    public static final String TAG = "TAG";
     //variable declaration
     //firebase
     FirebaseAuth mAuth;
+    FirebaseFirestore fStore;
+    String userId;
     //camera
     public static final int CAMERA_PERM_CODE = 101;
     public static final int CAMERA_REQUEST_CODE = 102;
@@ -74,6 +83,7 @@ public class Activity2 extends AppCompatActivity implements View.OnClickListener
 
         //assigning variables
         mAuth = FirebaseAuth.getInstance();
+        fStore = FirebaseFirestore.getInstance();
         click_image_id = (ImageView) findViewById(R.id.imageView3);
         textInputEmail = (TextInputLayout) findViewById(R.id.editTextTextEmailAddress);
         textInputPass = (TextInputLayout) findViewById(R.id.editTextTextPassword);
@@ -256,28 +266,44 @@ public class Activity2 extends AppCompatActivity implements View.OnClickListener
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
-                    User user = new User(email, password, username, bio);
-                    FirebaseDatabase.getInstance().getReference("Users")
-                            .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                            .setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    Toast.makeText(Activity2.this, "User registered successfully!", Toast.LENGTH_LONG).show();
+                    userId = mAuth.getCurrentUser().getUid();
+                    DocumentReference documentReference = fStore.collection("users").document(userId);
+                    Map<String,Object> user = new HashMap<>();
+                    user.put("Username", username);
+                    user.put("Bio", bio);
+                    documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()) {
-                                Toast.makeText(Activity2.this, "User registered successfully!", Toast.LENGTH_LONG).show();
-                                pb.setVisibility(View.GONE);
-
-                                //register and go to activity 3
-                                startActivity(new Intent(Activity2.this, Activity3.class));
-
-                            } else {
-                                Toast.makeText(Activity2.this, "Failed to register! Try again! One", Toast.LENGTH_LONG).show();
-                                pb.setVisibility(View.GONE);
-
-                            }
+                        public void onSuccess(Void aVoid) {
+                            Log.d(TAG, "onSuccess: User Profile is created for " + userId);
                         }
                     });
+
+
+                    pb.setVisibility(View.GONE);
+                    startActivity(new Intent(Activity2.this, Activity3.class));
+                   // User user = new User(email, password, username, bio);
+                   // FirebaseDatabase.getInstance().getReference("Users")
+                   //         .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                   //         .setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+                   //     @Override
+                   //     public void onComplete(@NonNull Task<Void> task) {
+                   //         if (task.isSuccessful()) {
+                   //             Toast.makeText(Activity2.this, "User registered successfully!", Toast.LENGTH_LONG).show();
+                   //             pb.setVisibility(View.GONE);
+
+                                //register and go to activity 3
+                    //            startActivity(new Intent(Activity2.this, Activity3.class));
+
+                    //        } else {
+                    //            Toast.makeText(Activity2.this, "Failed to register! Try again! ", Toast.LENGTH_LONG).show();
+                    //            pb.setVisibility(View.GONE);
+
+                    //        }
+                    //    }
+                    //});
                 } else {
-                    Toast.makeText(Activity2.this, "Failed to register! Try again! Two" + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Activity2.this, "Failed to register! Try again! " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                 }
                 pb.setVisibility(View.GONE);
             }
