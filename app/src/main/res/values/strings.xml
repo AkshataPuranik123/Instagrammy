@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Instagrammy</string>
+    <string name="logout">Logout</string>
+    <string name="username">Username</string>
+    <string name="short_bio">Short Bio</string>
+    <string name="profilepic">Profilepic</string>
 </resources>

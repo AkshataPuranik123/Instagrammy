@@ -9,14 +9,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.annotations.Nullable;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+
+import java.util.Objects;
 
 public class Activity3 extends AppCompatActivity {
     private Button logout;
     private TextView username, bio;
-    //private FirebaseFirestore fStore;
-    //private DatabaseReference userRef;
+    FirebaseFirestore fStore;
+    FirebaseAuth mAuth;
+    String userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,18 +31,28 @@ public class Activity3 extends AppCompatActivity {
         setContentView(R.layout.activity_3);
 
 
-        //username = (TextView)findViewById(R.id.textView6);
-        //bio = (TextView)findViewById(R.id.textView7);
-        //fStore = FirebaseFirestore.getInstance();
-        //userRef = fStore.getRefe               .collection("users");
+        username = findViewById(R.id.textView6);
+        bio = findViewById(R.id.textView7);
+        fStore = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+        fStore = FirebaseFirestore.getInstance();
+        userId = Objects.requireNonNull(mAuth.getCurrentUser()).getUid();
+
+        DocumentReference documentReference = fStore.collection("users").document(userId);
+        documentReference.addSnapshotListener(this, new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException error) {
+                username.setText(documentSnapshot.getString("Username"));
+                bio.setText(documentSnapshot.getString("Bio"));
+            }
+        });
 
 
 
 
 
 
-
-        logout = (Button)findViewById(R.id.button7);
+        logout = findViewById(R.id.button7);
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -46,10 +63,5 @@ public class Activity3 extends AppCompatActivity {
             }
         });
 
-        //Intent intent = getIntent();
-        //String displayname = intent.getExtras().getString("name");
-        //t1.setText(displayname);
-        //String displaybio = intent.getExtras().getString("bio");
-        //t2.setText(displaybio);
     }
 }
