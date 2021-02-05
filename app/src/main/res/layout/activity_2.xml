@@ -10,7 +10,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/backgrnd"
-    tools:context=".Activity2">
+    tools:context=".Registration">
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
@@ -48,8 +48,9 @@
 
         <ImageView
             android:id="@+id/imageView3"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="217dp"
+            android:layout_height="180dp"
+            android:layout_gravity="center_horizontal"
             app:srcCompat="@drawable/profilepicture" />
 
         <Button

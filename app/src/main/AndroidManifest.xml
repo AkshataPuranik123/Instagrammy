@@ -17,14 +17,14 @@
         tools:ignore="ExtraText">
         android:name="androidx.multidex.MultiDexApplication" >
 
-        <activity android:name=".Activity3" />
-        <activity android:name=".Activity2">
+        <activity android:name=".Profile" />
+        <activity android:name=".Registration">
             <meta-data
             android:name="android.support.PARENT_ACTIVITY"
-            android:value=".MainActivity" />
+            android:value=".LoginActivity" />
 
         </activity>
-        <activity android:name=".MainActivity">
+        <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

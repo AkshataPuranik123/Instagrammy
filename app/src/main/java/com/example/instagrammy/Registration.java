@@ -10,6 +10,11 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -33,7 +38,6 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
@@ -47,7 +51,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 
-public class Activity2 extends AppCompatActivity implements View.OnClickListener {
+public class Registration extends AppCompatActivity implements View.OnClickListener {
 
 
     public static final String TAG = "TAG";
@@ -120,7 +124,7 @@ public class Activity2 extends AppCompatActivity implements View.OnClickListener
 
         //To check if already logged in and direct to profile
         if(mAuth.getCurrentUser() != null){
-            startActivity(new Intent(Activity2.this, Activity3.class));
+            startActivity(new Intent(Registration.this, Profile.class));
             finish();
         }
     }
@@ -175,9 +179,34 @@ public class Activity2 extends AppCompatActivity implements View.OnClickListener
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CAMERA_REQUEST_CODE) {
             Bitmap image = (Bitmap) data.getExtras().get("data");
+            image = getCroppedBitmap(image);
             profileimage.setImageBitmap(image);
         }
     }
+
+    public Bitmap getCroppedBitmap(Bitmap bitmap) {
+        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
+                bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(output);
+
+        final int color = 0xff424242;
+        final Paint paint = new Paint();
+        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+
+        paint.setAntiAlias(true);
+        canvas.drawARGB(0, 0, 0, 0);
+        paint.setColor(color);
+        // canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+        canvas.drawCircle(bitmap.getWidth() / 2, bitmap.getHeight() / 2,
+                bitmap.getWidth() / 2, paint);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, rect, rect, paint);
+        //Bitmap _bmp = Bitmap.createScaledBitmap(output, 60, 60, false);
+        //return _bmp;
+        return output;
+    }
+
+
 
 
     // For details
@@ -285,7 +314,7 @@ public class Activity2 extends AppCompatActivity implements View.OnClickListener
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if(task.isSuccessful()){
                                             //user info updated successfully
-                                            Toast.makeText(Activity2.this, "Photo updated successfully!", Toast.LENGTH_LONG).show();
+                                            Toast.makeText(Registration.this, "Photo updated successfully!", Toast.LENGTH_LONG).show();
 
                                         }
 
@@ -302,12 +331,12 @@ public class Activity2 extends AppCompatActivity implements View.OnClickListener
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
-                Toast.makeText(Activity2.this, "Image Uploaded.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(Registration.this, "Image Uploaded.", Toast.LENGTH_SHORT).show();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(Activity2.this, "Upload Failled.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(Registration.this, "Upload Failled.", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -341,14 +370,14 @@ public class Activity2 extends AppCompatActivity implements View.OnClickListener
                             }
                         });
 
-                        Toast.makeText(Activity2.this, "Photo Uploaded", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(Registration.this, "Photo Uploaded", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
 
-                        Toast.makeText(Activity2.this, "Upload Failed", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(Registration.this, "Upload Failed", Toast.LENGTH_SHORT).show();
                     }
                 });
         return refLink;
@@ -372,7 +401,7 @@ public class Activity2 extends AppCompatActivity implements View.OnClickListener
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
-                    Toast.makeText(Activity2.this, "User registered successfully!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(Registration.this, "User registered successfully!", Toast.LENGTH_LONG).show();
 
                     String refLink = upload(mAuth.getCurrentUser());
 
@@ -396,10 +425,10 @@ public class Activity2 extends AppCompatActivity implements View.OnClickListener
 
 
                     pb.setVisibility(View.GONE);
-                    startActivity(new Intent(Activity2.this, Activity3.class));
+                    startActivity(new Intent(Registration.this, Profile.class));
 
                 } else {
-                    Toast.makeText(Activity2.this, "Failed to register! Try again! " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Registration.this, "Failed to register! Try again! " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                 }
                 pb.setVisibility(View.GONE);
             }

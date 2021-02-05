@@ -2,16 +2,18 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_alignWithParentIfMissing="true"
-    android:layout_alignParentLeft="true"
+    android:layout_alignParentStart="true"
     android:layout_alignParentTop="true"
-    android:layout_alignParentRight="true"
+    android:layout_alignParentEnd="true"
     android:layout_alignParentBottom="true"
 
+    android:background="#FFFFFF"
     android:layerType="software"
-    tools:context=".Activity3">
+    tools:context=".Profile">
 
     <ImageView
         android:id="@+id/imageView2"
@@ -19,7 +21,6 @@
         android:layout_height="93dp"
         android:layout_alignParentTop="true"
         android:layout_marginStart="37dp"
-        android:layout_marginLeft="37dp"
         android:layout_marginTop="39dp"
         app:srcCompat="@drawable/profilepicture"
         tools:layout_editor_absoluteX="147dp"
@@ -38,6 +39,7 @@
         android:layout_marginBottom="647dp"
         android:gravity="left"
         android:text="Username"
+        android:textColor="#090909"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -57,16 +59,24 @@
         android:layout_marginBottom="595dp"
         android:gravity="left"
         android:text="Short Bio"
+        android:textColor="#090909"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:layout_editor_absoluteY="417dp" />
 
-    <ScrollView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
 
-
-    </ScrollView>
+    <GridView
+        android:id="@+id/gridView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="73dp"
+        android:gravity="center"
+        android:horizontalSpacing="1dp"
+        android:numColumns="3"
+        android:stretchMode="columnWidth"
+        android:verticalSpacing="1dp"></GridView>
 
 
     <Button
@@ -76,9 +86,12 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="37dp"
-        android:layout_marginLeft="37dp"
-        android:layout_marginTop="652dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="157dp"
+        android:layout_marginLeft="157dp"
+        android:layout_marginTop="658dp"
+        android:layout_marginEnd="77dp"
+        android:layout_toStartOf="@+id/floatingActionButton"
         android:text="Logout" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -92,9 +105,13 @@
         android:layout_marginEnd="28dp"
         android:layout_marginRight="28dp"
         android:layout_marginBottom="22dp"
+        android:layout_gravity="end|bottom"
         android:clickable="true"
+        android:foregroundGravity="center_horizontal"
         app:backgroundTint="#1DE9B6"
         app:rippleColor="#FFFFFF"
-        app:srcCompat="@drawable/ic_baseline_add_24" />
+        app:srcCompat="@drawable/ic_baseline_add_24"
+        tools:ignore="VectorDrawableCompat" />
+
 
 </RelativeLayout>

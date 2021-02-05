@@ -6,7 +6,7 @@
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
-    tools:context=".MainActivity">
+    tools:context=".LoginActivity">
 
     <TextView
         android:id="@+id/textView"
@@ -15,9 +15,10 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
+        android:layout_centerHorizontal="true"
         android:layout_marginTop="33dp"
-        android:layout_marginEnd="14dp"
-        android:layout_marginRight="14dp"
+        android:layout_marginEnd="26dp"
+        android:layout_marginRight="26dp"
         android:fontFamily="@font/niconne"
         android:gravity="fill|fill_horizontal|center_vertical"
         android:text="Welcome to Instagrammy!"
@@ -48,10 +49,12 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="296dp"
+        android:background="#DAD7D7"
         android:drawableLeft="@drawable/ic_action_email"
         android:ems="10"
         android:hint="Email"
         android:inputType="textEmailAddress"
+        android:shadowColor="#B5AEAE"
         android:textColor="#090909"
         android:textColorHint="#090909"
         tools:layout_editor_absoluteX="30dp"
@@ -68,6 +71,7 @@
         android:layout_marginTop="362dp"
         android:layout_marginEnd="36dp"
         android:layout_marginRight="36dp"
+        android:background="#DAD7D7"
         android:drawableLeft="@drawable/ic_action_pass"
         android:ems="10"
         android:hint="Password"
@@ -98,7 +102,7 @@
         android:layout_marginStart="180dp"
         android:layout_marginLeft="180dp"
         android:layout_marginBottom="154dp"
-        android:text="OR"
+        android:text="-------------------- OR --------------------"
         android:textColor="#0B0A0A"
         app:layout_constraintStart_toStartOf="parent"
         tools:layout_editor_absoluteY="494dp" />
