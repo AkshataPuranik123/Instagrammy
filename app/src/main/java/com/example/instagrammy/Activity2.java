@@ -10,11 +10,14 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
@@ -22,16 +25,23 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 
+import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -46,10 +56,14 @@ public class Activity2 extends AppCompatActivity implements View.OnClickListener
     FirebaseAuth mAuth;
     FirebaseFirestore fStore;
     String userId;
+    //firestorage
+    StorageReference storageReference;
     //camera
     public static final int CAMERA_PERM_CODE = 101;
     public static final int CAMERA_REQUEST_CODE = 102;
-    ImageView click_image_id;
+    private Bitmap image;
+    ImageView profileimage;
+    Uri pickedImgUri;
     //text fields
     private TextInputLayout textInputEmail;
     private TextInputLayout textInputPass;
@@ -84,7 +98,7 @@ public class Activity2 extends AppCompatActivity implements View.OnClickListener
         //assigning variables
         mAuth = FirebaseAuth.getInstance();
         fStore = FirebaseFirestore.getInstance();
-        click_image_id = (ImageView) findViewById(R.id.imageView3);
+        profileimage = (ImageView) findViewById(R.id.imageView3);
         textInputEmail = (TextInputLayout) findViewById(R.id.editTextTextEmailAddress);
         textInputPass = (TextInputLayout) findViewById(R.id.editTextTextPassword);
         textInputConfirmPass = (TextInputLayout) findViewById(R.id.editTextTextPassword1);
@@ -94,6 +108,7 @@ public class Activity2 extends AppCompatActivity implements View.OnClickListener
         camera_open_id = (Button) findViewById(R.id.camera);
         sign_up = (Button) findViewById(R.id.signUp);
         pb = (ProgressBar) findViewById(R.id.progressBar);
+        storageReference = FirebaseStorage.getInstance().getReference();
 
 
         // Camera_open button is for open the camera
@@ -160,11 +175,9 @@ public class Activity2 extends AppCompatActivity implements View.OnClickListener
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CAMERA_REQUEST_CODE) {
             Bitmap image = (Bitmap) data.getExtras().get("data");
-            click_image_id.setImageBitmap(image);
+            profileimage.setImageBitmap(image);
         }
     }
-
-
 
 
     // For details
@@ -251,6 +264,97 @@ public class Activity2 extends AppCompatActivity implements View.OnClickListener
             }
     }
 
+    private void updateUserInfo(Uri pickedImgUri, FirebaseUser currentUser) {
+        StorageReference mstorage = FirebaseStorage.getInstance().getReference().child("user_photos");
+        StorageReference imageFilePath = mstorage.child(pickedImgUri.getLastPathSegment());
+        imageFilePath.putFile(pickedImgUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                //image uploaded successfully
+                //now get url
+                imageFilePath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        //url contain user image url
+                        UserProfileChangeRequest profileUpdate = new UserProfileChangeRequest.Builder()
+                                .setPhotoUri(uri)
+                                .build();
+                        currentUser.updateProfile(profileUpdate)
+                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if(task.isSuccessful()){
+                                            //user info updated successfully
+                                            Toast.makeText(Activity2.this, "Photo updated successfully!", Toast.LENGTH_LONG).show();
+
+                                        }
+
+                                    }
+                                });
+                    }
+                });
+            }
+        });
+    }
+    private void uploadImageToFirebase(Uri imageUri) {
+        final StorageReference image = storageReference.child("profile.jpg");
+        image.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                Toast.makeText(Activity2.this, "Image Uploaded.", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(Activity2.this, "Upload Failled.", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+
+    private String upload(FirebaseUser currentUser) {
+
+        image = ((BitmapDrawable) profileimage.getDrawable()).getBitmap();
+
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+
+        image.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+
+        //final String currentUserId = UUID.randomUUID().toString();
+        StorageReference imageRef = storageReference.child(currentUser.getUid()+"/profile.jpg");
+        String refLink = imageRef.toString();
+
+
+        byte[] b = stream.toByteArray();
+        imageRef.putBytes(b)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+
+                        taskSnapshot.getMetadata().getReference().getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @Override
+                            public void onSuccess(Uri uri) {
+                                Uri downloadUri = uri;
+
+                            }
+                        });
+
+                        Toast.makeText(Activity2.this, "Photo Uploaded", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                        Toast.makeText(Activity2.this, "Upload Failed", Toast.LENGTH_SHORT).show();
+                    }
+                });
+        return refLink;
+    }
+
+
 
     //Check all constraints before moving on
     private void registerUser() {
@@ -262,52 +366,47 @@ public class Activity2 extends AppCompatActivity implements View.OnClickListener
         String username = textInputUsername.getEditText().getText().toString().trim();
         String bio = textInputBio.getEditText().getText().toString().trim();
         pb.setVisibility(View.VISIBLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         mAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
                     Toast.makeText(Activity2.this, "User registered successfully!", Toast.LENGTH_LONG).show();
+
+                    String refLink = upload(mAuth.getCurrentUser());
+
                     userId = mAuth.getCurrentUser().getUid();
                     DocumentReference documentReference = fStore.collection("users").document(userId);
                     Map<String,Object> user = new HashMap<>();
                     user.put("Username", username);
                     user.put("Bio", bio);
+                    user.put("ProfilePicture", refLink);
+
+                    //updateUserInfo(pickedImgUri, mAuth.getCurrentUser());
+
+
                     documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
                             Log.d(TAG, "onSuccess: User Profile is created for " + userId);
+
                         }
                     });
 
 
                     pb.setVisibility(View.GONE);
                     startActivity(new Intent(Activity2.this, Activity3.class));
-                   // User user = new User(email, password, username, bio);
-                   // FirebaseDatabase.getInstance().getReference("Users")
-                   //         .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                   //         .setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
-                   //     @Override
-                   //     public void onComplete(@NonNull Task<Void> task) {
-                   //         if (task.isSuccessful()) {
-                   //             Toast.makeText(Activity2.this, "User registered successfully!", Toast.LENGTH_LONG).show();
-                   //             pb.setVisibility(View.GONE);
 
-                                //register and go to activity 3
-                    //            startActivity(new Intent(Activity2.this, Activity3.class));
-
-                    //        } else {
-                    //            Toast.makeText(Activity2.this, "Failed to register! Try again! ", Toast.LENGTH_LONG).show();
-                    //            pb.setVisibility(View.GONE);
-
-                    //        }
-                    //    }
-                    //});
                 } else {
                     Toast.makeText(Activity2.this, "Failed to register! Try again! " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                 }
                 pb.setVisibility(View.GONE);
             }
+
+
         });
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
     }
 
 

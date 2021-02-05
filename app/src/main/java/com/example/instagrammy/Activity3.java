@@ -1,13 +1,22 @@
 package com.example.instagrammy;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.Registry;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.annotations.Nullable;
 import com.google.firebase.firestore.DocumentReference;
@@ -15,8 +24,10 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import java.util.Objects;
+
 
 public class Activity3 extends AppCompatActivity {
     private Button logout;
@@ -24,6 +35,7 @@ public class Activity3 extends AppCompatActivity {
     FirebaseFirestore fStore;
     FirebaseAuth mAuth;
     String userId;
+    ImageView profilePicture;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,17 +45,26 @@ public class Activity3 extends AppCompatActivity {
 
         username = findViewById(R.id.textView6);
         bio = findViewById(R.id.textView7);
+        profilePicture = findViewById(R.id.imageView2);
         fStore = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
         fStore = FirebaseFirestore.getInstance();
         userId = Objects.requireNonNull(mAuth.getCurrentUser()).getUid();
 
+
         DocumentReference documentReference = fStore.collection("users").document(userId);
         documentReference.addSnapshotListener(this, new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException error) {
+
+                StorageReference storageReference = FirebaseStorage.getInstance().getReference().child(mAuth.getCurrentUser().getUid()+"/profile.jpg");
                 username.setText(documentSnapshot.getString("Username"));
                 bio.setText(documentSnapshot.getString("Bio"));
+
+                Glide.with(Activity3.this)
+                        .load(storageReference)
+                        .centerCrop()
+                        .into(profilePicture);
             }
         });
 
