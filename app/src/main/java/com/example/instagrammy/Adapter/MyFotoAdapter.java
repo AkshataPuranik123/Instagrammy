@@ -1,4 +1,4 @@
-package com.example.instagrammy;
+package com.example.instagrammy.Adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -10,6 +10,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
+
+import com.bumptech.glide.Glide;
+import com.example.instagrammy.R;
 
 /*public class MyFotoAdapter extends RecyclerView.Adapter<MyFotoAdapter.ViewHolder> {
 
@@ -37,7 +40,7 @@ import java.util.List;
 
     @Override
     public int getItemCount() {
-        return 0;
+        return mPosts.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
@@ -52,5 +55,4 @@ import java.util.List;
         }
     }
 
-}
-*/
+}*/

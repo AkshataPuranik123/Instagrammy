@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -11,107 +13,126 @@
     android:layout_alignParentEnd="true"
     android:layout_alignParentBottom="true"
 
+    android:layout_gravity="right|top"
     android:background="#FFFFFF"
     android:layerType="software"
     tools:context=".Profile">
 
-    <ImageView
-        android:id="@+id/imageView2"
-        android:layout_width="93dp"
-        android:layout_height="93dp"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="37dp"
-        android:layout_marginTop="39dp"
-        app:srcCompat="@drawable/profilepicture"
-        tools:layout_editor_absoluteX="147dp"
-        tools:layout_editor_absoluteY="224dp" />
 
-    <TextView
-        android:id="@+id/textView6"
-        android:layout_width="240dp"
-        android:layout_height="30dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"
-        android:layout_centerVertical="true"
-        android:layout_marginEnd="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginBottom="647dp"
-        android:gravity="left"
-        android:text="Username"
-        android:textColor="#090909"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="365dp" />
-
-    <TextView
-        android:id="@+id/textView7"
-        android:layout_width="240dp"
-        android:layout_height="50dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"
-        android:layout_centerVertical="true"
-        android:layout_marginEnd="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginBottom="595dp"
-        android:gravity="left"
-        android:text="Short Bio"
-        android:textColor="#090909"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="417dp" />
-
-
-    <GridView
-        android:id="@+id/gridView"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="73dp"
-        android:gravity="center"
-        android:horizontalSpacing="1dp"
-        android:numColumns="3"
-        android:stretchMode="columnWidth"
-        android:verticalSpacing="1dp"></GridView>
+        android:id="@+id/scrollView">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:id="@+id/top_bar"
+                android:padding="16dp">
+
+                <ImageView
+                    android:id="@+id/imageView2"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    app:srcCompat="@drawable/profilepicture" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="117dp"
+                    android:orientation="vertical"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="40dp">
+
+                    <LinearLayout
+                        android:layout_width="260dp"
+                        android:paddingTop="20dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/textView6"
+                            android:layout_width="250dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="right|center_horizontal|top"
+                            android:gravity="left"
+                            android:text="Username"
+                            android:textColor="#090909"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/textView7"
+                            android:layout_width="240dp"
+                            android:layout_height="70dp"
+                            android:layout_gravity="right|top"
+                            android:layout_marginEnd="10dp"
+                            android:layout_marginRight="10dp"
+                            android:layout_marginBottom="595dp"
+                            android:gravity="left"
+                            android:text="Short Bio"
+                            android:textColor="#090909"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            tools:layout_editor_absoluteY="417dp" />
 
 
-    <Button
-        android:id="@+id/button7"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginStart="157dp"
-        android:layout_marginLeft="157dp"
-        android:layout_marginTop="658dp"
-        android:layout_marginEnd="77dp"
-        android:layout_toStartOf="@+id/floatingActionButton"
-        android:text="Logout" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="493dp">
+
+            </androidx.recyclerview.widget.RecyclerView>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view_save"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone">
+
+            </androidx.recyclerview.widget.RecyclerView>
+
+
+
+        </LinearLayout>
+
+    </ScrollView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/floatingActionButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginTop="652dp"
-        android:layout_marginEnd="28dp"
-        android:layout_marginRight="28dp"
-        android:layout_marginBottom="22dp"
-        android:layout_gravity="end|bottom"
+        android:layout_marginEnd="37dp"
+        android:layout_marginBottom="17dp"
         android:clickable="true"
         android:foregroundGravity="center_horizontal"
         app:backgroundTint="#1DE9B6"
         app:rippleColor="#FFFFFF"
         app:srcCompat="@drawable/ic_baseline_add_24"
         tools:ignore="VectorDrawableCompat" />
+
+    <Button
+        android:id="@+id/button7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="25dp"
+        android:layout_marginBottom="17dp"
+        android:text="Logout" />
 
 
 </RelativeLayout>

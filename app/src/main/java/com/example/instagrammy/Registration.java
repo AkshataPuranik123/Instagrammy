@@ -293,55 +293,7 @@ public class Registration extends AppCompatActivity implements View.OnClickListe
             }
     }
 
-    private void updateUserInfo(Uri pickedImgUri, FirebaseUser currentUser) {
-        StorageReference mstorage = FirebaseStorage.getInstance().getReference().child("user_photos");
-        StorageReference imageFilePath = mstorage.child(pickedImgUri.getLastPathSegment());
-        imageFilePath.putFile(pickedImgUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                //image uploaded successfully
-                //now get url
-                imageFilePath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                    @Override
-                    public void onSuccess(Uri uri) {
-                        //url contain user image url
-                        UserProfileChangeRequest profileUpdate = new UserProfileChangeRequest.Builder()
-                                .setPhotoUri(uri)
-                                .build();
-                        currentUser.updateProfile(profileUpdate)
-                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        if(task.isSuccessful()){
-                                            //user info updated successfully
-                                            Toast.makeText(Registration.this, "Photo updated successfully!", Toast.LENGTH_LONG).show();
-
-                                        }
-
-                                    }
-                                });
-                    }
-                });
-            }
-        });
-    }
-    private void uploadImageToFirebase(Uri imageUri) {
-        final StorageReference image = storageReference.child("profile.jpg");
-        image.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-
-                Toast.makeText(Registration.this, "Image Uploaded.", Toast.LENGTH_SHORT).show();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(Registration.this, "Upload Failled.", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-    }
-
+    //upload photos to firebase storage
     private String upload(FirebaseUser currentUser) {
 
         image = ((BitmapDrawable) profileimage.getDrawable()).getBitmap();
@@ -377,7 +329,7 @@ public class Registration extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onFailure(@NonNull Exception e) {
 
-                        Toast.makeText(Registration.this, "Upload Failed", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(Registration.this, "Photo Upload Failed", Toast.LENGTH_SHORT).show();
                     }
                 });
         return refLink;
@@ -411,8 +363,6 @@ public class Registration extends AppCompatActivity implements View.OnClickListe
                     user.put("Username", username);
                     user.put("Bio", bio);
                     user.put("ProfilePicture", refLink);
-
-                    //updateUserInfo(pickedImgUri, mAuth.getCurrentUser());
 
 
                     documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
