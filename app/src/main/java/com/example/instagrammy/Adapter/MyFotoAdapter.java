@@ -6,15 +6,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
 import com.bumptech.glide.Glide;
+import com.example.instagrammy.Model.Post;
 import com.example.instagrammy.R;
 
-/*public class MyFotoAdapter extends RecyclerView.Adapter<MyFotoAdapter.ViewHolder> {
+public class MyFotoAdapter extends RecyclerView.Adapter<MyFotoAdapter.ViewHolder> {
 
     private Context context;
     private List<Post> mPosts;
@@ -34,7 +36,7 @@ import com.example.instagrammy.R;
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
         Post post = mPosts.get(i);
-        Glide.with(context).load(post.getPostimage()).into(viewHolder.post_image);
+        Glide.with(context).load(post.getPostImage()).into(viewHolder.post_image);
 
     }
 
@@ -55,4 +57,4 @@ import com.example.instagrammy.R;
         }
     }
 
-}*/
+}

@@ -9,6 +9,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.app.ProgressDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -20,6 +22,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -27,6 +30,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 //import com.example.instagrammy.Adapter.MyFotoAdapter;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -46,12 +50,15 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -67,6 +74,7 @@ public class Profile extends AppCompatActivity {
     FirebaseAuth mAuth;
     String userId;
     StorageReference storageReference;
+    String myUrl = "";
 
 
 
@@ -116,10 +124,38 @@ public class Profile extends AppCompatActivity {
                 username.setText(documentSnapshot.getString("Username"));
                 bio.setText(documentSnapshot.getString("Bio"));
 
-                Glide.with(Profile.this)
-                        .load(storageReference)
-                        .circleCrop()
-                        .into(profilePicture);
+                RequestOptions options = new RequestOptions().error(R.drawable.profilepicture);
+
+                //if profile picture is added else display default picture
+
+                storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        Glide.with(Profile.this)
+                                .load(storageReference)
+                                .circleCrop()
+                                .into(profilePicture);
+
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                        Glide.with(Profile.this)
+                                .load(storageReference)
+                                .circleCrop()
+                                .apply(options)
+                                .into(profilePicture);
+
+                    }
+                });
+
+
+
+
+
+
+
             }
         });
 
@@ -131,7 +167,6 @@ public class Profile extends AppCompatActivity {
         //Action when button is clicked
         logout.setOnClickListener(this::onClick);
         addpictures.setOnClickListener(this::onClick);
-
     }
 
     //Buttons functionality
@@ -176,24 +211,44 @@ public class Profile extends AppCompatActivity {
 
     private void openCamera(){
         //Toast.makeText(this, "Camera Open request", Toast.LENGTH_SHORT).show();
+        //starting camera and clicking image
         Intent camera_intent
                 = new Intent(MediaStore
                 .ACTION_IMAGE_CAPTURE);
+        /*CropImage.activity()
+                .setAspectRatio(1,1)
+                .start(Profile.this);*/
+
         startActivityForResult(camera_intent, CAMERA_REQUEST_CODE);
+
     }
     @Override
     // This method will help to retrieve the image
     protected void onActivityResult(int requestCode, int resultCode, @androidx.annotation.Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CAMERA_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            //Uri imageUri = result.getUri();
+            //Bitmap image = null;
+
             Bitmap image = (Bitmap) data.getExtras().get("data");
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String dateTime = sdf.format(Calendar.getInstance().getTime()); // reading local time in the system
-            upload(mAuth.getCurrentUser(), image, dateTime);
+            upload(mAuth.getCurrentUser(), image);
+        } else {
+            Toast.makeText(this, "Somethings has gone Wrong!", Toast.LENGTH_SHORT).show();
+            finish();
         }
     }
 
-    private void upload(FirebaseUser currentUser, Bitmap image, String timestamp ) {
+    /*private  String getFileExtension(Uri uri){
+        ContentResolver contentResolver = getContentResolver();
+        MimeTypeMap mime = MimeTypeMap.getSingleton();
+        return mime.getExtensionFromMimeType(contentResolver.getType(uri));
+    }*/
+
+    private void upload(FirebaseUser currentUser, Bitmap image) {
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Posting");
+        progressDialog.show();
 
         //image = ((BitmapDrawable) profileimage.getDrawable()).getBitmap();
 
@@ -202,7 +257,7 @@ public class Profile extends AppCompatActivity {
         image.compress(Bitmap.CompressFormat.JPEG, 100, stream);
 
         //final String currentUserId = UUID.randomUUID().toString();
-        StorageReference imageRef = storageReference.child(currentUser.getUid()+"/"+timestamp+".jpg");
+        StorageReference imageRef = storageReference.child(currentUser.getUid()+"/"+System.currentTimeMillis()+".jpg");
 
 
 
@@ -217,18 +272,31 @@ public class Profile extends AppCompatActivity {
                             @Override
                             public void onSuccess(Uri uri) {
                                 Uri downloadUri = uri;
+                                myUrl = downloadUri.toString();
 
+                                DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts");
+
+                                String postId = reference.push().getKey();
+
+                                HashMap<String, Object> hashMap = new HashMap<>();
+                                hashMap.put("PostId", postId);
+                                hashMap.put("PostImage", myUrl);
+                                hashMap.put("Publisher", FirebaseAuth.getInstance().getCurrentUser().getUid());
+                                //hashMap.put("Description", desc); //for caption
+
+                                reference.child(postId).setValue(hashMap);
                             }
                         });
 
                         Toast.makeText(Profile.this, "Photo Uploaded", Toast.LENGTH_SHORT).show();
+                        progressDialog.dismiss();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
 
-                        Toast.makeText(Profile.this, "Upload Failed", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(Profile.this, "Upload Failed"+e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
     }

@@ -177,8 +177,10 @@ public class Registration extends AppCompatActivity implements View.OnClickListe
     // This method will help to retrieve the image
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        //final int THUMBNAIL_SIZE = 200;
         if (requestCode == CAMERA_REQUEST_CODE) {
             Bitmap image = (Bitmap) data.getExtras().get("data");
+            //image = Bitmap.createScaledBitmap(image, THUMBNAIL_SIZE, THUMBNAIL_SIZE, false);
             image = getCroppedBitmap(image);
             profileimage.setImageBitmap(image);
         }
