@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import com.bumptech.glide.Glide;
+import com.example.instagrammy.Model.Post;
 import com.example.instagrammy.R;
 
 public class MyFotoAdapter extends RecyclerView.Adapter<MyFotoAdapter.ViewHolder> {

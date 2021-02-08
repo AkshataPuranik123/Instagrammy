@@ -26,6 +26,7 @@ import com.bumptech.glide.Glide;
 //import com.example.instagrammy.Adapter.MyFotoAdapter;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.instagrammy.Adapter.MyFotoAdapter;
+import com.example.instagrammy.Model.Post;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -96,10 +97,10 @@ public class Profile extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
-        LinearLayoutManager linearLayoutManager = new GridLayoutManager(this, 3);
+        LinearLayoutManager linearLayoutManager = new GridLayoutManager(getApplicationContext(), 3);
         recyclerView.setLayoutManager(linearLayoutManager);
         postList = new ArrayList<>();
-        myFotoAdapter = new MyFotoAdapter(this, postList);
+        myFotoAdapter = new MyFotoAdapter(getApplicationContext(), postList);
         recyclerView.setAdapter(myFotoAdapter);
 
 
@@ -289,7 +290,7 @@ public class Profile extends AppCompatActivity {
                         Toast.makeText(Profile.this, "Upload Failed"+e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
-
+        myFotos();
     }
 
 
@@ -302,7 +303,7 @@ public class Profile extends AppCompatActivity {
                 postList.clear();
                 for (DataSnapshot snapshot :dataSnapshot.getChildren()){
                     Post post = snapshot.getValue(Post.class);
-                    if (post.getPublisher().equals(profileId)){
+                    if (userId.equals(profileId)){
                         postList.add(post);
                     }
                 }

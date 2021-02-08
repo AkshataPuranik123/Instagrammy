@@ -115,6 +115,7 @@ public class Registration extends AppCompatActivity implements View.OnClickListe
         storageReference = FirebaseStorage.getInstance().getReference();
 
 
+
         // Camera_open button is for open the camera
         // and add the setOnClickListener in this button
         camera_open_id.setOnClickListener(this);

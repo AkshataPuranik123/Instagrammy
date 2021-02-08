@@ -1,12 +1,12 @@
 package com.example.instagrammy.Model;
 
 public class Post {
-    private String postid;
+    private String postId;
     private String postImage;
     private String publisher;
 
-    public Post(String postid, String postImage, String publisher){
-        this.postid = postid;
+    public Post(String postId, String postImage, String publisher){
+        this.postId = postId;
         this.postImage = postImage;
         this.publisher = publisher;
     }
@@ -14,12 +14,12 @@ public class Post {
     public Post() {
     }
 
-    public String getPostid() {
-        return postid;
+    public String getPostId() {
+        return postId;
     }
 
-    public void setPostid(String postid) {
-        this.postid = postid;
+    public void setPostId(String postId) {
+        this.postId = postId;
     }
 
     public String getPostImage() {
