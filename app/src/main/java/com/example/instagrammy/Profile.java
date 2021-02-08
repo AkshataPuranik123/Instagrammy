@@ -7,6 +7,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import com.example.instagrammy.Model.Post;
 
 import android.Manifest;
 import android.app.ProgressDialog;
@@ -31,6 +32,8 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 //import com.example.instagrammy.Adapter.MyFotoAdapter;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.instagrammy.Adapter.MyFotoAdapter;
+import com.example.instagrammy.Model.Post;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -75,12 +78,13 @@ public class Profile extends AppCompatActivity {
     String userId;
     StorageReference storageReference;
     String myUrl = "";
+    String profileId;
 
 
 
-    //RecyclerView recyclerView;
-    //MyFotoAdapter myFotoAdapter;
-    //List<Post> postList;
+    RecyclerView recyclerView;
+    MyFotoAdapter myFotoAdapter;
+    List<Post> postList;
 
 
     @Override
@@ -99,18 +103,15 @@ public class Profile extends AppCompatActivity {
         addpictures = findViewById(R.id.floatingActionButton);
         logout = findViewById(R.id.button7);
         storageReference = FirebaseStorage.getInstance().getReference();
-
-
-        /*SharedPreferences prefs = getContext().getSharedPreferences("PREFS", Context.MODE_PRIVATE);
-        profileid = prefs.getString("profileid", "none");
+        profileId = userId.toString();
 
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
-        LinearLayoutManager linearLayoutManager = new GridLayoutManager(getContext(), 3);
+        LinearLayoutManager linearLayoutManager = new GridLayoutManager(this, 3);
         recyclerView.setLayoutManager(linearLayoutManager);
         postList = new ArrayList<>();
-        myFotoAdapter = new MyFotoAdapter(getContext(), postList);
-        recyclerView.setAdapter(myFotoAdapter);*/
+        myFotoAdapter = new MyFotoAdapter(this, postList);
+        recyclerView.setAdapter(myFotoAdapter);
 
 
         //Load profile photo, username and bio on login or registration
@@ -161,7 +162,7 @@ public class Profile extends AppCompatActivity {
 
 
         //load photos
-        //myFotos();
+        myFotos();
 
 
         //Action when button is clicked
@@ -210,7 +211,6 @@ public class Profile extends AppCompatActivity {
     }
 
     private void openCamera(){
-        //Toast.makeText(this, "Camera Open request", Toast.LENGTH_SHORT).show();
         //starting camera and clicking image
         Intent camera_intent
                 = new Intent(MediaStore
@@ -233,6 +233,7 @@ public class Profile extends AppCompatActivity {
 
             Bitmap image = (Bitmap) data.getExtras().get("data");
             upload(mAuth.getCurrentUser(), image);
+
         } else {
             Toast.makeText(this, "Somethings has gone Wrong!", Toast.LENGTH_SHORT).show();
             finish();
@@ -279,9 +280,9 @@ public class Profile extends AppCompatActivity {
                                 String postId = reference.push().getKey();
 
                                 HashMap<String, Object> hashMap = new HashMap<>();
-                                hashMap.put("PostId", postId);
-                                hashMap.put("PostImage", myUrl);
-                                hashMap.put("Publisher", FirebaseAuth.getInstance().getCurrentUser().getUid());
+                                hashMap.put("postId", postId);
+                                hashMap.put("postImage", myUrl);
+                                hashMap.put("publisher", FirebaseAuth.getInstance().getCurrentUser().getUid());
                                 //hashMap.put("Description", desc); //for caption
 
                                 reference.child(postId).setValue(hashMap);
@@ -299,19 +300,12 @@ public class Profile extends AppCompatActivity {
                         Toast.makeText(Profile.this, "Upload Failed"+e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
+
     }
 
 
 
-
-
-
-
-
-
-
-
-    /*private void myFotos(){
+    private void myFotos(){
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts");
         reference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -319,7 +313,7 @@ public class Profile extends AppCompatActivity {
                 postList.clear();
                 for (DataSnapshot snapshot :dataSnapshot.getChildren()){
                     Post post = snapshot.getValue(Post.class);
-                    if (post.getPublisher().equals(profileid)){
+                    if (post.getPublisher().equals(profileId)){
                         postList.add(post);
                     }
                 }
@@ -335,7 +329,7 @@ public class Profile extends AppCompatActivity {
         });
 
 
-    }*/
+    }
 
 
 
