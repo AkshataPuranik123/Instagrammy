@@ -14,6 +14,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -50,10 +51,13 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -182,32 +186,97 @@ public class Profile extends AppCompatActivity {
 
     private void openCamera(){
         //starting camera and clicking image
-        Intent camera_intent
+        /*Intent camera_intent
                 = new Intent(MediaStore
                 .ACTION_IMAGE_CAPTURE);
-        startActivityForResult(camera_intent, CAMERA_REQUEST_CODE);
-        /*CropImage.activity()
+        startActivityForResult(camera_intent, CAMERA_REQUEST_CODE);*/
+        CropImage.activity()
+                .setGuidelines(CropImageView.Guidelines.ON)
                 .setAspectRatio(1,1)
                 .start(Profile.this);
-        startActivityForResult( camera_intent , CAMERA_REQUEST_CODE);*/
+        //.setAspectRatio(1,1)
+        //startActivityForResult( camera_intent , CAMERA_REQUEST_CODE);
 
 
     }
 
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                Uri resultUri = result.getUri();
+                Bitmap image = null;
+                try {
+                    image = getThumbnail(resultUri);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                upload(mAuth.getCurrentUser(), image);
+
+                //From here you can load the image however you need to, I recommend using the Glide library
+
+
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
+            }
+        }
+    }
+
+
+
+    public Bitmap getThumbnail(Uri uri) throws FileNotFoundException, IOException{
+        InputStream input = this.getContentResolver().openInputStream(uri);
+
+        BitmapFactory.Options onlyBoundsOptions = new BitmapFactory.Options();
+        onlyBoundsOptions.inJustDecodeBounds = true;
+        onlyBoundsOptions.inDither=true;//optional
+        onlyBoundsOptions.inPreferredConfig=Bitmap.Config.ARGB_8888;//optional
+        BitmapFactory.decodeStream(input, null, onlyBoundsOptions);
+        input.close();
+
+        if ((onlyBoundsOptions.outWidth == -1) || (onlyBoundsOptions.outHeight == -1)) {
+            return null;
+        }
+
+        int originalSize = (onlyBoundsOptions.outHeight > onlyBoundsOptions.outWidth) ? onlyBoundsOptions.outHeight : onlyBoundsOptions.outWidth;
+        int THUMBNAIL_SIZE = 1024;
+
+        double ratio = (originalSize > THUMBNAIL_SIZE) ? (originalSize / THUMBNAIL_SIZE) : 1.0;
+
+        BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
+        bitmapOptions.inSampleSize = getPowerOfTwoForSampleRatio(ratio);
+        bitmapOptions.inDither = true; //optional
+        bitmapOptions.inPreferredConfig=Bitmap.Config.ARGB_8888;//
+        input = this.getContentResolver().openInputStream(uri);
+        Bitmap bitmap = BitmapFactory.decodeStream(input, null, bitmapOptions);
+        input.close();
+        return bitmap;
+    }
+
+    private static int getPowerOfTwoForSampleRatio(double ratio){
+        int k = Integer.highestOneBit((int)Math.floor(ratio));
+        if(k==0) return 1;
+        else return k;
+    }
+
+
+
+
+    /*@Override
     // This method will help to retrieve the image
     protected void onActivityResult(int requestCode, int resultCode, @androidx.annotation.Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CAMERA_REQUEST_CODE) {
-            /*CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
             Uri imageUri = result.getUri();
-            profilePicture.setImageURI(imageUri);*/
-            //Bitmap image = null;
             Bitmap image = (Bitmap) data.getExtras().get("data");
             upload(mAuth.getCurrentUser(), image);
         }
-    }
+    }*/
 
     /*private  String getFileExtension(Uri uri){
         ContentResolver contentResolver = getContentResolver();

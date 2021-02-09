@@ -9,7 +9,8 @@
 <RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/backgrnd"
+    android:background="@color/white"
+
     tools:context=".Registration">
 
     <androidx.cardview.widget.CardView
@@ -43,7 +44,8 @@
             android:layout_marginTop="12dp"
             android:layout_marginBottom="12dp"
             android:fontFamily="@font/montserrat_bold"
-            android:text="Create new account" />
+            android:text="Create new account"
+            android:textColor="#090909" />
 
 
         <ImageView
@@ -51,7 +53,9 @@
             android:layout_width="200dp"
             android:layout_height="200dp"
             android:layout_gravity="center_horizontal"
-            app:srcCompat="@drawable/profilepicture" />
+            android:adjustViewBounds="false"
+            android:cropToPadding="false"
+            app:srcCompat="@drawable/images" />
 
         <Button
             android:id="@+id/camera"
@@ -166,7 +170,8 @@
             android:layout_marginRight="8dp"
             android:layout_marginBottom="4dp"
             android:onClick="confirmInput"
-            android:text="I agree to Terms and Conditions" />
+            android:text="I agree to Terms and Conditions"
+            android:textColor="#090909" />
 
         <Button
             android:id="@+id/signUp"
