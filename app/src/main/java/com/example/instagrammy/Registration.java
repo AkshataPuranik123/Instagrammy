@@ -378,6 +378,13 @@ public class Registration extends AppCompatActivity implements View.OnClickListe
                         }
                     });
 
+                    try {
+                        Thread.sleep(1000);
+                    }
+                    catch (InterruptedException e){
+                        e.printStackTrace();
+                    }
+
 
                     pb.setVisibility(View.GONE);
                     startActivity(new Intent(Registration.this, Profile.class));

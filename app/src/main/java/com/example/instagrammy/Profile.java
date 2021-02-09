@@ -16,9 +16,11 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -27,8 +29,16 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 //import com.example.instagrammy.Adapter.MyFotoAdapter;
+import com.bumptech.glide.Priority;
+import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.signature.ObjectKey;
 import com.example.instagrammy.Adapter.MyFotoAdapter;
 import com.example.instagrammy.Model.Post;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -125,9 +135,25 @@ public class Profile extends AppCompatActivity {
 
                 GlideApp.with(Profile.this)
                         .load(storageReference)
-                        .placeholder(R.drawable.profilepicture)
+                        .transition(DrawableTransitionOptions.withCrossFade())
+                        .skipMemoryCache(true)
+                        .diskCacheStrategy(DiskCacheStrategy.NONE)
                         .circleCrop()
+                        .listener(new RequestListener<Drawable>() {
+                            @Override
+                            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                                // log exception
+                                Log.e("TAG", "Error loading image", e);
+                                return false; // important to return false so the error placeholder can be placed
+                            }
+
+                            @Override
+                            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                                return false;
+                            }
+                        })
                         .into(profilePicture);
+                //   .placeholder(R.drawable.profilepicture)
                 //.apply(RequestOptions.skipMemoryCacheOf(true))
                 //                        .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE))
 

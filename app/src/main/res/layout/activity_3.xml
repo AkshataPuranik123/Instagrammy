@@ -39,7 +39,7 @@
                 <ImageView
                     android:id="@+id/imageView2"
                     android:layout_width="120dp"
-                    android:layout_height="120dp"
+                    android:layout_height="135dp"
                     app:srcCompat="@drawable/profilepicture" />
 
                 <LinearLayout
@@ -88,10 +88,18 @@
 
 
             </LinearLayout>
+
+
+            <TextView
+                android:id="@+id/textView8"
+                android:layout_width="700dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center" />
+
             <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recycler_view"
                     android:layout_width="match_parent"
-                    android:layout_height="493dp">
+                    android:layout_height="wrap_content">
 
             </androidx.recyclerview.widget.RecyclerView>
 
