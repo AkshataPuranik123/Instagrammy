@@ -122,10 +122,10 @@ public class Profile extends AppCompatActivity {
                 GlideApp.with(Profile.this)
                         .load(storageReference)
                         .placeholder(R.drawable.profilepicture)
-                        .apply(RequestOptions.skipMemoryCacheOf(true))
-                        .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE))
                         .circleCrop()
                         .into(profilePicture);
+                //.apply(RequestOptions.skipMemoryCacheOf(true))
+                //                        .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE))
 
             }
         });
@@ -182,14 +182,14 @@ public class Profile extends AppCompatActivity {
 
     private void openCamera(){
         //starting camera and clicking image
-        /*Intent camera_intent
+        Intent camera_intent
                 = new Intent(MediaStore
                 .ACTION_IMAGE_CAPTURE);
-        startActivityForResult(camera_intent, CAMERA_REQUEST_CODE);*/
-        CropImage.activity()
+        startActivityForResult(camera_intent, CAMERA_REQUEST_CODE);
+        /*CropImage.activity()
                 .setAspectRatio(1,1)
                 .start(Profile.this);
-        //startActivityForResult( camera_intent , CAMERA_REQUEST_CODE);
+        startActivityForResult( camera_intent , CAMERA_REQUEST_CODE);*/
 
 
     }
@@ -199,23 +199,13 @@ public class Profile extends AppCompatActivity {
     // This method will help to retrieve the image
     protected void onActivityResult(int requestCode, int resultCode, @androidx.annotation.Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+        if (requestCode == CAMERA_REQUEST_CODE) {
+            /*CropImage.ActivityResult result = CropImage.getActivityResult(data);
             Uri imageUri = result.getUri();
-            profilePicture.setImageURI(imageUri);
+            profilePicture.setImageURI(imageUri);*/
             //Bitmap image = null;
-            //Bitmap image = (Bitmap) data.getExtras().get("data");
-            Bitmap image = null;
-            try {
-                image = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            Bitmap image = (Bitmap) data.getExtras().get("data");
             upload(mAuth.getCurrentUser(), image);
-
-        } else {
-            Toast.makeText(this, "Something has gone Wrong!", Toast.LENGTH_SHORT).show();
-            finish();
         }
     }
 
@@ -230,7 +220,7 @@ public class Profile extends AppCompatActivity {
         progressDialog.setMessage("Posting");
         progressDialog.show();
 
-        image = ((BitmapDrawable) profilePicture.getDrawable()).getBitmap();
+        //image = ((BitmapDrawable) profileImage.getDrawable()).getBitmap();
 
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
