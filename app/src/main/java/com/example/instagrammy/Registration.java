@@ -67,6 +67,7 @@ public class Registration extends AppCompatActivity implements View.OnClickListe
     public static final int CAMERA_REQUEST_CODE = 102;
     private Bitmap image;
     ImageView profileimage;
+    String refLink;
     Uri pickedImgUri;
     //text fields
     private TextInputLayout textInputEmail;
@@ -113,6 +114,7 @@ public class Registration extends AppCompatActivity implements View.OnClickListe
         sign_up = (Button) findViewById(R.id.signUp);
         pb = (ProgressBar) findViewById(R.id.progressBar);
         storageReference = FirebaseStorage.getInstance().getReference();
+        refLink = null;
 
 
 
@@ -185,6 +187,7 @@ public class Registration extends AppCompatActivity implements View.OnClickListe
             image = getCroppedBitmap(image);
             profileimage.setImageBitmap(image);
         }
+
     }
 
     public Bitmap getCroppedBitmap(Bitmap bitmap) {
@@ -325,7 +328,7 @@ public class Registration extends AppCompatActivity implements View.OnClickListe
                             }
                         });
 
-                        Toast.makeText(Registration.this, "Photo Uploaded", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(Registration.this, "Photo Uploaded", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -357,8 +360,7 @@ public class Registration extends AppCompatActivity implements View.OnClickListe
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
                     Toast.makeText(Registration.this, "User registered successfully!", Toast.LENGTH_LONG).show();
-
-                    String refLink = upload(mAuth.getCurrentUser());
+                    refLink = upload(mAuth.getCurrentUser());
 
                     userId = mAuth.getCurrentUser().getUid();
                     DocumentReference documentReference = fStore.collection("users").document(userId);

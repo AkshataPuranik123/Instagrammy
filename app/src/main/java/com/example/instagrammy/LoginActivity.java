@@ -84,7 +84,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         mAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(this, task -> {
             if (task.isSuccessful()) {
 
-                Toast.makeText(LoginActivity.this, "Login Successful!", Toast.LENGTH_LONG).show();
+                Toast.makeText(LoginActivity.this, "Login Successful!", Toast.LENGTH_SHORT).show();
                 //FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 //fetchData();
 
@@ -102,25 +102,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
 
 
-    }
-
-    public void fetchData() {
-        DocumentReference  documentReference = fStore.collection("users").document("0Wjoz8MqNYfEsyeh0KkFCGAJgw22");
-        documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                if(documentSnapshot.exists()){
-
-                }else{
-                    Toast.makeText(getApplicationContext(),"Row Not found",Toast.LENGTH_LONG).show();
-                }
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(getApplicationContext(),"Failed to fetch data", Toast.LENGTH_LONG).show();
-            }
-        });
     }
 
 

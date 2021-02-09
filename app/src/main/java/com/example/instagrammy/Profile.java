@@ -9,10 +9,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -24,6 +26,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 //import com.example.instagrammy.Adapter.MyFotoAdapter;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.instagrammy.Adapter.MyFotoAdapter;
 import com.example.instagrammy.Model.Post;
@@ -49,6 +52,8 @@ import com.google.firebase.storage.UploadTask;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -68,13 +73,11 @@ public class Profile extends AppCompatActivity {
     String userId;
     StorageReference storageReference;
     String myUrl = "";
-    String profileId;
-
-
 
     RecyclerView recyclerView;
     MyFotoAdapter myFotoAdapter;
     List<Post> postList;
+    Post post;
 
 
     @Override
@@ -93,7 +96,6 @@ public class Profile extends AppCompatActivity {
         addpictures = findViewById(R.id.floatingActionButton);
         logout = findViewById(R.id.button7);
         storageReference = FirebaseStorage.getInstance().getReference();
-        profileId = userId.toString();
 
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
@@ -102,6 +104,7 @@ public class Profile extends AppCompatActivity {
         postList = new ArrayList<>();
         myFotoAdapter = new MyFotoAdapter(getApplicationContext(), postList);
         recyclerView.setAdapter(myFotoAdapter);
+        post = new Post("","",userId);
 
 
         //Load profile photo, username and bio on login or registration
@@ -115,70 +118,47 @@ public class Profile extends AppCompatActivity {
                 username.setText(documentSnapshot.getString("Username"));
                 bio.setText(documentSnapshot.getString("Bio"));
 
-                RequestOptions options = new RequestOptions().error(R.drawable.profilepicture);
 
-                //if profile picture is added else display default picture
-
-                storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                    @Override
-                    public void onSuccess(Uri uri) {
-                        Glide.with(Profile.this)
-                                .load(storageReference)
-                                .circleCrop()
-                                .into(profilePicture);
-
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-
-                        Glide.with(Profile.this)
-                                .load(storageReference)
-                                .circleCrop()
-                                .apply(options)
-                                .into(profilePicture);
-
-                    }
-                });
-
-
-
-
-
-
+                GlideApp.with(Profile.this)
+                        .load(storageReference)
+                        .placeholder(R.drawable.profilepicture)
+                        .apply(RequestOptions.skipMemoryCacheOf(true))
+                        .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE))
+                        .circleCrop()
+                        .into(profilePicture);
 
             }
         });
 
-
-        //load photos
+        //load existing photos
         myFotos();
+        // Show full image when thumbnail is clicked
 
 
         //Action when button is clicked
-        logout.setOnClickListener(this::onClick);
-        addpictures.setOnClickListener(this::onClick);
+
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseAuth.getInstance().signOut();
+                Toast.makeText(getApplicationContext(),
+                        "Logged Out",Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(Profile.this, LoginActivity.class));
+            }
+        });
+
+
+        addpictures.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                askCameraPermissions();
+            }
+        });
     }
+
+
 
     //Buttons functionality
-    public void onClick (View v){
-        switch (v.getId()) {
-            case R.id.button7:
-                Logout();
-                break;
-            case R.id.floatingActionButton:
-                askCameraPermissions();
-                break;
-        }
-    }
-
-    private void Logout() {
-        FirebaseAuth.getInstance().signOut();
-        Toast.makeText(getApplicationContext(),
-                "Logged Out", Toast.LENGTH_SHORT).show();
-        startActivity(new Intent(Profile.this, LoginActivity.class));
-    }
-
     //For camera
     private void askCameraPermissions(){
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
@@ -202,30 +182,39 @@ public class Profile extends AppCompatActivity {
 
     private void openCamera(){
         //starting camera and clicking image
-        Intent camera_intent
+        /*Intent camera_intent
                 = new Intent(MediaStore
                 .ACTION_IMAGE_CAPTURE);
-        /*CropImage.activity()
+        startActivityForResult(camera_intent, CAMERA_REQUEST_CODE);*/
+        CropImage.activity()
                 .setAspectRatio(1,1)
-                .start(Profile.this);*/
+                .start(Profile.this);
+        //startActivityForResult( camera_intent , CAMERA_REQUEST_CODE);
 
-        startActivityForResult(camera_intent, CAMERA_REQUEST_CODE);
 
     }
+
+
     @Override
     // This method will help to retrieve the image
     protected void onActivityResult(int requestCode, int resultCode, @androidx.annotation.Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == CAMERA_REQUEST_CODE) {
+        if (requestCode == CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
-            //Uri imageUri = result.getUri();
+            Uri imageUri = result.getUri();
+            profilePicture.setImageURI(imageUri);
             //Bitmap image = null;
-
-            Bitmap image = (Bitmap) data.getExtras().get("data");
+            //Bitmap image = (Bitmap) data.getExtras().get("data");
+            Bitmap image = null;
+            try {
+                image = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             upload(mAuth.getCurrentUser(), image);
 
         } else {
-            Toast.makeText(this, "Somethings has gone Wrong!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Something has gone Wrong!", Toast.LENGTH_SHORT).show();
             finish();
         }
     }
@@ -241,7 +230,7 @@ public class Profile extends AppCompatActivity {
         progressDialog.setMessage("Posting");
         progressDialog.show();
 
-        //image = ((BitmapDrawable) profileimage.getDrawable()).getBitmap();
+        image = ((BitmapDrawable) profilePicture.getDrawable()).getBitmap();
 
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
@@ -265,14 +254,16 @@ public class Profile extends AppCompatActivity {
                                 Uri downloadUri = uri;
                                 myUrl = downloadUri.toString();
 
+
                                 DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts");
 
                                 String postId = reference.push().getKey();
+                                String profileId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
                                 HashMap<String, Object> hashMap = new HashMap<>();
                                 hashMap.put("postId", postId);
                                 hashMap.put("postImage", myUrl);
-                                hashMap.put("publisher", FirebaseAuth.getInstance().getCurrentUser().getUid());
+                                hashMap.put("publisher", profileId);
                                 //hashMap.put("Description", desc); //for caption
 
                                 reference.child(postId).setValue(hashMap);
@@ -301,9 +292,9 @@ public class Profile extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 postList.clear();
-                for (DataSnapshot snapshot :dataSnapshot.getChildren()){
-                    Post post = snapshot.getValue(Post.class);
-                    if (userId.equals(profileId)){
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+                    post = snapshot.getValue(Post.class);
+                    if (post.getPublisher().equals(userId)){
                         postList.add(post);
                     }
                 }

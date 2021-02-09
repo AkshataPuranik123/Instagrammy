@@ -1,10 +1,13 @@
 package com.example.instagrammy.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 
 import androidx.annotation.NonNull;
@@ -15,11 +18,13 @@ import java.util.List;
 import com.bumptech.glide.Glide;
 import com.example.instagrammy.Model.Post;
 import com.example.instagrammy.R;
+import com.example.instagrammy.ShowFullSizePhotos;
 
 public class MyFotoAdapter extends RecyclerView.Adapter<MyFotoAdapter.ViewHolder> {
 
     private Context context;
     private List<Post> mPosts;
+
 
     public MyFotoAdapter(Context context, List<Post> mPosts){
         this.context = context;
@@ -37,6 +42,16 @@ public class MyFotoAdapter extends RecyclerView.Adapter<MyFotoAdapter.ViewHolder
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
         Post post = mPosts.get(i);
         Glide.with(context).load(post.getPostImage()).into(viewHolder.post_image);
+        viewHolder.relative.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, ShowFullSizePhotos.class);
+                intent.putExtra("image", post.getPostImage());
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(intent);
+
+            }
+        });
 
     }
 
@@ -48,11 +63,13 @@ public class MyFotoAdapter extends RecyclerView.Adapter<MyFotoAdapter.ViewHolder
     public class ViewHolder extends RecyclerView.ViewHolder{
 
         public ImageView post_image;
+        public RelativeLayout relative;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
             post_image = itemView.findViewById(R.id.post_image);
+            relative = itemView.findViewById(R.id.relative);
 
         }
     }
