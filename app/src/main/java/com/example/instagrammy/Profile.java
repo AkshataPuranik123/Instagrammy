@@ -21,6 +21,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -43,6 +44,7 @@ import com.example.instagrammy.Adapter.MyFotoAdapter;
 import com.example.instagrammy.Model.Post;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -77,10 +79,15 @@ import java.util.Objects;
 
 
 public class Profile extends AppCompatActivity {
-    private Button logout;
-    private FloatingActionButton addpictures;
-    public static final int CAMERA_PERM_CODE = 101;
-    public static final int CAMERA_REQUEST_CODE = 102;
+
+    BottomNavigationView bottomNavigationView;
+
+
+
+    //private Button logout;
+    //private FloatingActionButton addpictures;
+    //public static final int CAMERA_PERM_CODE = 101;
+    //public static final int CAMERA_REQUEST_CODE = 102;
     ImageView profilePicture;
     private TextView username, bio;
     FirebaseFirestore fStore;
@@ -108,8 +115,8 @@ public class Profile extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         fStore = FirebaseFirestore.getInstance();
         userId = Objects.requireNonNull(mAuth.getCurrentUser()).getUid();
-        addpictures = findViewById(R.id.floatingActionButton);
-        logout = findViewById(R.id.button7);
+        //addpictures = findViewById(R.id.floatingActionButton);
+        //logout = findViewById(R.id.button7);
         storageReference = FirebaseStorage.getInstance().getReference();
 
         recyclerView = findViewById(R.id.recycler_view);
@@ -120,6 +127,11 @@ public class Profile extends AppCompatActivity {
         myFotoAdapter = new MyFotoAdapter(getApplicationContext(), postList);
         recyclerView.setAdapter(myFotoAdapter);
         post = new Post("","",userId);
+
+
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
+        bottomNavigationView.getMenu().getItem(2).setChecked(true);
 
 
         //Load profile photo, username and bio on login or registration
@@ -163,12 +175,14 @@ public class Profile extends AppCompatActivity {
 
         //load existing photos
         myFotos();
-        // Show full image when thumbnail is clicked
 
+
+        // Show full image when thumbnail is clicked
+        //Done using MyFotoAdapter
 
         //Action when button is clicked
 
-        logout.setOnClickListener(new View.OnClickListener() {
+        /*logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 FirebaseAuth.getInstance().signOut();
@@ -185,10 +199,69 @@ public class Profile extends AppCompatActivity {
                 startActivity(new Intent(Profile.this, PhotoDescnHash.class));
                 //askCameraPermissions();
             }
-        });
+        });*/
     }
 
+    private BottomNavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener =
+            new BottomNavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
 
+                    switch (menuItem.getItemId()){
+                        case R.id.nav_home:
+                            //Go to global feed
+                            break;
+
+                        case R.id.nav_add:
+                            startActivity(new Intent(Profile.this, PhotoDescnHash.class));
+                            break;
+
+                        case R.id.nav_localprofile:
+                            //Do Nothing
+                            break;
+
+                        case R.id.nav_logout:
+                            FirebaseAuth.getInstance().signOut();
+                            Toast.makeText(getApplicationContext(),
+                                    "Logged Out",Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(Profile.this, LoginActivity.class));
+                            break;
+
+                    }
+
+
+
+
+                    return true;
+                }
+            };
+
+
+    private void myFotos(){
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts");
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                postList.clear();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+                    post = snapshot.getValue(Post.class);
+                    if (post.getPublisher().equals(userId)){
+                        postList.add(post);
+                    }
+                }
+                Collections.reverse(postList);
+                myFotoAdapter.notifyDataSetChanged();
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
+    }
     /*
     //Buttons functionality
     //For camera
@@ -366,35 +439,6 @@ public class Profile extends AppCompatActivity {
         myFotos();
     }
     */
-
-
-
-    private void myFotos(){
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts");
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                postList.clear();
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
-                    post = snapshot.getValue(Post.class);
-                    if (post.getPublisher().equals(userId)){
-                        postList.add(post);
-                    }
-                }
-                Collections.reverse(postList);
-                myFotoAdapter.notifyDataSetChanged();
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
-
-    }
-
 
 
 }
