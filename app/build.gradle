@@ -6,6 +6,8 @@ plugins {
 apply plugin: 'com.android.application'
 // Add the following line:
 apply plugin: 'com.google.gms.google-services'  // Google Services plugin
+// MlKit
+//apply plugin: 'com.google.android.gms.strict-version-matcher-plugin'
 
 
 
@@ -46,8 +48,6 @@ dependencies {
     implementation "androidx.recyclerview:recyclerview:1.1.0"
     // For control over item selection of both touch and mouse driven selection
     implementation "androidx.recyclerview:recyclerview-selection:1.1.0"
-
-
     implementation platform('com.google.firebase:firebase-bom:26.3.0')
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "androidx.multidex:multidex:2.0.1"
@@ -70,6 +70,15 @@ dependencies {
     testImplementation 'junit:junit:4.13.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    /*implementation 'com.google.android.gms:play-services-vision:20.0.0'
+    implementation 'com.google.firebase:firebase-ml-vision:24.0.3'
+    implementation 'com.google.android.gms:play-services-vision:20.1.1'
+    implementation 'com.google.android.gms:play-services-vision-common:19.1.1'
+    implementation 'com.google.firebase:firebase-ml-vision-image-label-model:20.0.2'*/
+    //implementation 'com.google.mlkit:image-labeling:17.0.2 '
+
+    // Use this dependency to use dynamically downloaded model in Google Play Service
+    implementation 'com.google.android.gms:play-services-mlkit-image-labeling:16.0.2'
 
 }
 

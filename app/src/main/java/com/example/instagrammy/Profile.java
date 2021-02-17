@@ -182,13 +182,14 @@ public class Profile extends AppCompatActivity {
         addpictures.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                askCameraPermissions();
+                startActivity(new Intent(Profile.this, PhotoDescnHash.class));
+                //askCameraPermissions();
             }
         });
     }
 
 
-
+    /*
     //Buttons functionality
     //For camera
     private void askCameraPermissions(){
@@ -211,12 +212,11 @@ public class Profile extends AppCompatActivity {
         }
     }
 
+     */
+    /*
+
     private void openCamera(){
         //starting camera and clicking image
-        /*Intent camera_intent
-                = new Intent(MediaStore
-                .ACTION_IMAGE_CAPTURE);
-        startActivityForResult(camera_intent, CAMERA_REQUEST_CODE);*/
         CropImage.activity()
                 .setGuidelines(CropImageView.Guidelines.ON)
                 .setAspectRatio(1,1)
@@ -241,6 +241,7 @@ public class Profile extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
 
                 upload(mAuth.getCurrentUser(), image);
 
@@ -303,13 +304,8 @@ public class Profile extends AppCompatActivity {
             Bitmap image = (Bitmap) data.getExtras().get("data");
             upload(mAuth.getCurrentUser(), image);
         }
-    }*/
+    }
 
-    /*private  String getFileExtension(Uri uri){
-        ContentResolver contentResolver = getContentResolver();
-        MimeTypeMap mime = MimeTypeMap.getSingleton();
-        return mime.getExtensionFromMimeType(contentResolver.getType(uri));
-    }*/
 
     private void upload(FirebaseUser currentUser, Bitmap image) {
         ProgressDialog progressDialog = new ProgressDialog(this);
@@ -369,6 +365,7 @@ public class Profile extends AppCompatActivity {
                 });
         myFotos();
     }
+    */
 
 
 
