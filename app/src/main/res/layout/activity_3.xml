@@ -99,7 +99,8 @@
             <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recycler_view"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="60dp">
 
             </androidx.recyclerview.widget.RecyclerView>
 
@@ -123,7 +124,6 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:id="@+id/bottom"
-
         android:layout_alignParentBottom="true"
         android:layout_height="wrap_content">
 
@@ -136,9 +136,6 @@
             app:labelVisibilityMode="unlabeled"
             android:background="@color/white"
             app:menu="@menu/bottom_navigation"/>
-
-
-
 
 
 

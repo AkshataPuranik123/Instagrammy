@@ -82,8 +82,6 @@ public class Profile extends AppCompatActivity {
 
     BottomNavigationView bottomNavigationView;
 
-
-
     //private Button logout;
     //private FloatingActionButton addpictures;
     //public static final int CAMERA_PERM_CODE = 101;
@@ -126,7 +124,7 @@ public class Profile extends AppCompatActivity {
         postList = new ArrayList<>();
         myFotoAdapter = new MyFotoAdapter(getApplicationContext(), postList);
         recyclerView.setAdapter(myFotoAdapter);
-        post = new Post("","",userId);
+        post = new Post("","",userId,"");
 
 
         bottomNavigationView = findViewById(R.id.bottom_navigation);
@@ -210,6 +208,7 @@ public class Profile extends AppCompatActivity {
                     switch (menuItem.getItemId()){
                         case R.id.nav_home:
                             //Go to global feed
+                            startActivity(new Intent(Profile.this, GlobalFeed.class));
                             break;
 
                         case R.id.nav_add:
@@ -228,9 +227,6 @@ public class Profile extends AppCompatActivity {
                             break;
 
                     }
-
-
-
 
                     return true;
                 }

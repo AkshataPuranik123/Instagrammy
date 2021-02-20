@@ -79,6 +79,7 @@ dependencies {
 
     // Use this dependency to use dynamically downloaded model in Google Play Service
     implementation 'com.google.android.gms:play-services-mlkit-image-labeling:16.0.2'
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
 
 }
 

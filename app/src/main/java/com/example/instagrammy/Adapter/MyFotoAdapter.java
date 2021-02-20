@@ -45,6 +45,8 @@ public class MyFotoAdapter extends RecyclerView.Adapter<MyFotoAdapter.ViewHolder
         viewHolder.relative.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                //on clicking the page see full view
                 Intent intent = new Intent(context, ShowFullSizePhotos.class);
                 intent.putExtra("image", post.getPostImage());
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
