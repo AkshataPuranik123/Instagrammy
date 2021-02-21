@@ -75,7 +75,7 @@
             android:hint="Description"
             android:textColor="@color/black"
             android:textColorHint="@color/black"
-            android:maxLines="5"
+            android:maxLines="3"
             android:id="@+id/description"/>
 
 

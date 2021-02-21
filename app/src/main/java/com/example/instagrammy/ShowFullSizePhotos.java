@@ -20,7 +20,7 @@ public class ShowFullSizePhotos extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_show_full_size_photos);
+        /*setContentView(R.layout.activity_show_full_size_photos);
         ImageView imageView = (ImageView) findViewById(R.id.fullScreenimageView);
         image = getIntent().getExtras().getString("image");
         Log.e("Image link", image);
@@ -30,6 +30,6 @@ public class ShowFullSizePhotos extends AppCompatActivity {
                 .into(imageView);
         //Resources res = getResources();
         //int resId = res.getIdentifier(image , "drawable", getPackageName());
-        //imageView.setImageURI(Uri.parse(image));
+        //imageView.setImageURI(Uri.parse(image));*/
     }
 }

@@ -237,10 +237,10 @@ public class Registration extends AppCompatActivity implements View.OnClickListe
             if (passwordInput.isEmpty()) {
                 textInputPass.setError("Field can't be empty");
                 return false;
-            } if (!PASSWORD_PATTERN.matcher(passwordInput).matches()) {
+            } /*if (!PASSWORD_PATTERN.matcher(passwordInput).matches()) {
             textInputPass.setError("Password must have atleast 4 characters; one uppercase, one lowercase, one digit, one special character and no whitespaces.");
             return false;
-        }else {
+        }*/ else {
                 textInputPass.setError(null);
                 return true;
             }

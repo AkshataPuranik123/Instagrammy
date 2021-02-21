@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import com.bumptech.glide.Glide;
+import com.example.instagrammy.CommentsActivity;
 import com.example.instagrammy.Model.Post;
 import com.example.instagrammy.R;
 import com.example.instagrammy.ShowFullSizePhotos;
@@ -47,10 +48,17 @@ public class MyFotoAdapter extends RecyclerView.Adapter<MyFotoAdapter.ViewHolder
             public void onClick(View v) {
 
                 //on clicking the page see full view
-                Intent intent = new Intent(context, ShowFullSizePhotos.class);
-                intent.putExtra("image", post.getPostImage());
+                Intent intent = new Intent(context, CommentsActivity.class);
+                intent.putExtra("postid", post.getPostId());
+                intent.putExtra("publisherid", post.getPublisher());
+                intent.putExtra("descriptionImage", post.getDescription());
+                intent.putExtra("postImage", post.getPostImage());
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
+                /*Intent intent = new Intent(context, ShowFullSizePhotos.class);
+                intent.putExtra("image", post.getPostImage());
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(intent);*/
 
             }
         });

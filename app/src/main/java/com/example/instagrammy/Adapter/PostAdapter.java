@@ -81,6 +81,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>{
                 Intent intent = new Intent(mContext, CommentsActivity.class);
                 intent.putExtra("postid", post.getPostId());
                 intent.putExtra("publisherid", post.getPublisher());
+                intent.putExtra("descriptionImage", post.getDescription());
+                intent.putExtra("postImage", post.getPostImage());
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 mContext.startActivity(intent);
             }
@@ -132,7 +134,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>{
 
         //String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         DocumentReference reference = FirebaseFirestore.getInstance().collection("users").document(userid);
-        StorageReference storageReference = FirebaseStorage.getInstance().getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid() + "/profile.jpg");
+        StorageReference storageReference = FirebaseStorage.getInstance().getReference().child(userid + "/profile.jpg");
 
         reference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override

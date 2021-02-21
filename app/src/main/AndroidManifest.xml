@@ -19,7 +19,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Instagrammy"
         tools:ignore="ExtraText">
-        <activity android:name=".CommentsActivity"></activity>
+        <activity
+            android:name=".CommentsActivity" />
         <activity android:name=".GlobalFeed" />
         <activity android:name=".PhotoDescnHash" />
         <activity
