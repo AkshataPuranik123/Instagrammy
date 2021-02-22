@@ -22,7 +22,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/niconne"
-                android:text="Instagrammy"
+                android:text="Global Feed"
                 android:textAlignment="center"
                 android:textColor="#F50057"
                 android:textSize="36sp" />
